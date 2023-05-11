@@ -4,3 +4,10 @@
 *.asv
 set_paths.m
 startup.m
+*tar.gz
+*.bin
+*.errlog
+*.outlog
+*.queue
+*.toolkits
+
