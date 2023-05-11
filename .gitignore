@@ -1,0 +1,6 @@
+*.mat
+*.nc
+*.hdf
+*.asv
+set_paths.m
+startup.m
