@@ -10,4 +10,4 @@ startup.m
 *.outlog
 *.queue
 *.toolkits
-
+*.outbin
