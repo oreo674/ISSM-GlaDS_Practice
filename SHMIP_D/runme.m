@@ -19,7 +19,7 @@ function ISSM = issm_func(sheet_cond,time, name)
         md=setmask(md,'','');
 
         % Run parameterization script to set up geometry, velocity, material properties, etc.
-        md=parameterize(md,'box_steady.par');
+        md=parameterize(md,'SHMIP_D.par');
 
         % GLADS HYDROLOGY PARAMETERIZATION
         md.hydrology=hydrologyglads();
