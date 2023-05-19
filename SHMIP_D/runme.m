@@ -63,11 +63,7 @@ function ISSM = issm_func(sheet_cond,time, name)
         md.basalforcings.geothermalflux = 50;
 
         % One time-varying moulin input
-        [a,pos] = min(sqrt((md.mesh.x-500).^2+(md.mesh.y-500).^2));
-        time=0:md.timestepping.time_step:md.timestepping.final_time;
-        md.hydrology.moulin_input = 7.93e-11*ones(md.mesh.numberofvertices+1,numel(time));
-        md.hydrology.moulin_input(end,:)=time;
-        md.hydrology.moulin_input(pos,:)=4;
+        md.hydrology.moulin_input = zeros(md.mesh.numberofvertices, 1);
 
         save BoxParam md;
     end 
