@@ -1,4 +1,4 @@
-function ISSM = issm_func(DT,time, name)
+function SHMIP_D = runme(DT,time, name)
     close all
     steps=[1:3];
     set_paths;
