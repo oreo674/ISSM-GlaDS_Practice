@@ -73,7 +73,9 @@ function ISSM = issm_func(DT,time, name)
         basal = 7.93e-11;
         temp = -16*cos(2*pi/year*t) - 5 + DT;
         runoff = max(0,(md.geometry.surface*temp*DDF)) + basal;
-        g
+        time=0:timestepping.time_step:timestepping.final_time;
+        surface_input = runoff*ones(md.mesh.numberofvertices,numel(time));
+        surface_input(end,:)=time;
 
         save BoxParam md;
     end 
