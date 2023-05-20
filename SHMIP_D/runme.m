@@ -1,4 +1,4 @@
-function ISSM = issm_func(sheet_cond,time, name)
+function ISSM = issm_func(DT,time, name)
     close all
     steps=[1:3];
     set_paths;
@@ -25,7 +25,7 @@ function ISSM = issm_func(sheet_cond,time, name)
         md.hydrology=hydrologyglads();
 
         % PARAMETERS
-        md.hydrology.sheet_conductivity = sheet_cond*ones(md.mesh.numberofvertices, 1);
+        md.hydrology.sheet_conductivity = 5e-3*ones(md.mesh.numberofvertices, 1);
         md.hydrology.cavity_spacing = 2;
         md.hydrology.bump_height = 0.1*ones(md.mesh.numberofvertices, 1);
         md.hydrology.englacial_void_ratio = 1e-4;
@@ -62,8 +62,18 @@ function ISSM = issm_func(sheet_cond,time, name)
         md.basalforcings.groundedice_melting_rate = 1*ones(md.mesh.numberofvertices, 1);
         md.basalforcings.geothermalflux = 50;
 
-        % One time-varying moulin input
+        % No moulins 
         md.hydrology.moulin_input = zeros(md.mesh.numberofvertices, 1);
+
+
+        % Time and temp dependence
+        year = 31536000;
+        lr = -0.0075;
+        DDF = 0.01/86400;
+        basal = 7.93e-11;
+        temp = -16*cos(2*pi/year*t) - 5 + DT;
+        runoff = max(0,(md.geometry.surface*temp*DDF)) + basal;
+        g
 
         save BoxParam md;
     end 
