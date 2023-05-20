@@ -66,17 +66,6 @@ function ISSM = issm_func(DT,time, name)
         md.hydrology.moulin_input = zeros(md.mesh.numberofvertices, 1);
 
 
-        % Time and temp dependence
-        year = 31536000;
-        lr = -0.0075;
-        DDF = 0.01/86400;
-        basal = 7.93e-11;
-        temp = -16*cos(2*pi/year*t) - 5 + DT;
-        time=0:timestepping.time_step:timestepping.final_time;
-        runoff = max(0,(md.geometry.surface*temp*DDF)) + basal;
-        surface_input = runoff*ones(md.mesh.numberofvertices,numel(time));
-        surface_input(end,:)=time;
-
         save BoxParam md;
     end 
 
@@ -98,7 +87,7 @@ function ISSM = issm_func(DT,time, name)
         md.settings.output_frequency = 110;	    % Only save results every 30 timesteps
         md.timestepping.cfl_coefficient = 0.5;  % Must be <1 for stability
         md.timestepping.final_time=time;          % 10 years
-
+        
         md.initialization.vel = zeros(md.mesh.numberofvertices, 1) + 30;
         md.initialization.vx = zeros(md.mesh.numberofvertices, 1) - 30;
         md.initialization.vy = zeros(md.mesh.numberofvertices, 1) + 0;
@@ -110,6 +99,20 @@ function ISSM = issm_func(DT,time, name)
         md.stressbalance.reltol = 0.1;
         md.stressbalance.abstol = nan;
         md.stressbalance.maxiter = 100;
+
+
+        % Time and temp dependence
+        year = 31536000;
+        lr = -0.0075;
+        DDF = 0.01/86400;
+        basal = 7.93e-11;
+        temp = -16*cos(2*pi/year*t) - 5 + DT;
+        time=0:timestepping.time_step:timestepping.final_time;
+        runoff = max(0,(md.geometry.surface*temp*DDF)) + basal;
+        surface_input = runoff*ones(md.mesh.numberofvertices,numel(time));
+        surface_input(end,:)=time;
+
+                
 
         md.verbose.solution=1;
         md=solve(md,'Transient');
