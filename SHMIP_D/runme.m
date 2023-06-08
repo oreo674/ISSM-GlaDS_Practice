@@ -1,4 +1,4 @@
-function SHMIP_D = runme(DT,time, name)
+function SHMIP_D = runme(DT,ti, name)
     close all
     steps=[1:3];
     set_paths;
@@ -60,7 +60,10 @@ function SHMIP_D = runme(DT,time, name)
         % FORCING
         md.hydrology.melt_flag = 1;
         md.basalforcings.groundedice_melting_rate = 1*ones(md.mesh.numberofvertices, 1);
-        md.basalforcings.geothermalflux = 50;
+        md.basalforcings.geothermalflux = 0; %% OG value is 50mW/m^2
+        %%% Get rid of these forcings? %%%
+        
+        %%% Use time-dep mass balance or ground_ice_melt?
 
         % No moulins 
         md.hydrology.moulin_input = zeros(md.mesh.numberofvertices, 1);
@@ -84,10 +87,12 @@ function SHMIP_D = runme(DT,time, name)
         % Define the time stepping scheme
         md.timestepping=timesteppingadaptive();
         md.timestepping.time_step_min=86400/md.constants.yts;
-        md.settings.output_frequency = 110;	    % Only save results every 30 timesteps
+        md.settings.output_frequency = 5;	    % Only save results every 30 timesteps
         md.timestepping.cfl_coefficient = 0.5;  % Must be <1 for stability
-        md.timestepping.final_time=time;          % 10 years
+        md.timestepping.final_time=ti;          % 10 years
         
+        
+
         md.initialization.vel = zeros(md.mesh.numberofvertices, 1) + 30;
         md.initialization.vx = zeros(md.mesh.numberofvertices, 1) - 30;
         md.initialization.vy = zeros(md.mesh.numberofvertices, 1) + 0;
@@ -95,23 +100,28 @@ function SHMIP_D = runme(DT,time, name)
         md = setmask(md,'','');
 
         % NUMERICAL PARAMETERS
-        md.stressbalance.restol = 1e-3;% %%CHANGE THIS BETWEEN TESTS
+        md.stressbalance.restol = 1e-4;% %%CHANGE THIS BETWEEN TESTS
         md.stressbalance.reltol = 0.1;
         md.stressbalance.abstol = nan;
         md.stressbalance.maxiter = 100;
 
 
-        % Time and temp dependence
-        year = 31536000;
-        lr = -0.0075;
-        DDF = 0.01/86400;
+        %%Time and temp dependence
+        %year = 31536000; sec per yr (for simu time in s)
+        year = 365;% ???
+        lr = -0.0075;% is this the correct val? units
+        DDF = 0.01/86400;% is this the correct val? units m/(K*s)
         basal = 7.93e-11;
-        time=0:timestepping.time_step:timestepping.final_time;
-        temp = -16*cos(2*pi/year*time) - 5 + DT;
-        runoff = max(0,(md.geometry.surface*temp*DDF)) + basal;
-        surface_input = runoff*ones(md.mesh.numberofvertices,numel(time));
-        surface_input(end,:)=time;
-
+        %time=0:md.timestepping.time_step_min:md.timestepping.final_time;
+        time = linspace(0,md.timestepping.final_time,md.mesh.numberofvertices);
+        temp = (-16)*cos(2*pi*time/year) - 5 + DT;
+        runoff = basal + max(0, (md.geometry.surface*lr+temp)*DDF);
+        md.basalforcings.groundedice_melting_rate = runoff*ones(md.mesh.numberofvertices, 1);
+        % surface_input = runoff.*ones(md.mesh.numberofvertices,numel(time));
+        % surface_input = [surface_input; time]; %% changing s_i to
+        % ground_ice_melt = runoff
+        
+        %%%     Uncomment if ground_ice_melt and mass_balance dont work %%%
                 
 
         md.verbose.solution=1;
@@ -122,19 +132,19 @@ function SHMIP_D = runme(DT,time, name)
         save(matname, 'md');
     end 
     
-    figure('Units', 'inches', 'Position', [2, 2, 10, 5])
-    plotmodel(md,'data',md.results.TransientSolution(1).HydrologySheetThickness,'title','Initial sheet thickness [m]',...
-        'data',md.results.TransientSolution(end).HydrologySheetThickness,'title','Final sheet thickness [m]', ...
-        'data',md.results.TransientSolution(1).EffectivePressure,'title','Initial N [Pa]',...
-        'data',md.results.TransientSolution(end).EffectivePressure,'title','Final N [Pa]')
+    % figure('Units', 'inches', 'Position', [2, 2, 10, 5])
+    % plotmodel(md,'data',md.results.TransientSolution(1).HydrologySheetThickness,'title','Initial sheet thickness [m]',...
+    %     'data',md.results.TransientSolution(end).HydrologySheetThickness,'title','Final sheet thickness [m]', ...
+    %     'data',md.results.TransientSolution(1).EffectivePressure,'title','Initial N [Pa]',...
+    %     'data',md.results.TransientSolution(end).EffectivePressure,'title','Final N [Pa]')
 
-    h_sheet = [md.results.TransientSolution.HydrologySheetThickness];
-    phi = [md.results.TransientSolution.HydraulicPotential];
-    Q = abs([md.results.TransientSolution.ChannelDischarge]);
-    S = [md.results.TransientSolution.ChannelArea];
-    tt = [md.results.TransientSolution.time];
+    % h_sheet = [md.results.TransientSolution.HydrologySheetThickness];
+    % phi = [md.results.TransientSolution.HydraulicPotential];
+    % Q = abs([md.results.TransientSolution.ChannelDischarge]);
+    % S = [md.results.TransientSolution.ChannelArea];
+    % tt = [md.results.TransientSolution.time];
 
-    print(name, '-dpng', '-r600')
+    %print(name, '-dpng', '-r600')
 
     %figure
     %plot(tt, mean(h_sheet, 1))
