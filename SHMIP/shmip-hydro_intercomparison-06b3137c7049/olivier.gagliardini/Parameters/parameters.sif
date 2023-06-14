@@ -1,0 +1,44 @@
+! Common input parameters for all tests SHMIP 
+
+! All Units are in m, year, MPa
+! For ice flow 
+$yearindays = 365.00 
+$yearinsec = yearindays*24*60*60 
+$MPainPa = 1.0e6 
+
+$ub = 1.0e-6*yearinsec        !(1.0e-6 m/s)
+
+!Prefactor from Cuffey and Paterson (2010) in MPa^{-3} a^{-1}
+! temperate Ice (power law for SSA)
+$rhoi = 910.0/(MPainPa*yearinsec^2) 
+$rhow = 1000.0/(MPainPa*yearinsec^2) 
+$A1 = 2.89165e-13*yearinsec*MPainPa^3
+$A2 = 2.42736e-02*yearinsec*MPainPa^3
+
+$ng = 3.0
+$Aglen = 2.5e-25*yearinsec*MPainPa^3
+$eta = (2.0*Aglen)^(-1.0/ng)
+
+$gravity = 9.80*yearinsec^2  
+
+! For the sheet
+$Ar = Aglen
+$alphas = 1.25 
+$betas = 1.5 
+$lr = 2.0 
+$hr = 0.1 
+$Ks = 0.005*yearinsec*(1.0/MPainPa)^(1.0-betas) 
+$Hs = 0.05 ! IC for h
+
+! For the Channels
+$alphac = 1.25 
+$betac = 1.5 
+$Kc = 0.1*yearinsec*(1.0/MPainPa)^(1.0-betac) 
+$Ac = Aglen  
+$lc = 2.0 
+$Ct = 7.5e-8*MPainPa 
+$Cw = 4220.0*yearinsec^2
+$Lw = 334000.0*yearinsec^2
+
+! For the Moulins
+$Am = 4.0

@@ -1,0 +1,31 @@
+! Definition of the valley geometry 
+! for SHMIP E and F
+
+$Hmin = 1.0
+$L = 6.0e3
+$W = 1.0e3
+$ function Surface(x,y) \
+  import Hmin {\
+  _Surface  = 100.0*(x+200.0)^0.25 + x/60.0 - 2.0e10^0.25 + Hmin ;\
+}
+
+$ function f(x) \
+  import Para, L {\
+  _f  = (Surface(L,y)-Para*L)/L^2 * x^2 + Para*x ;\
+}
+
+$ function g(y) \
+  import Para, L {\
+  _g  = 0.5e-6 * abs(y)^3 ;\
+}
+
+$ function h(x) \
+  import Para, L {\
+  _h  = (-4.5*x/L + 5.0) * (Surface(x,0.0)-f( ;\
+}
+
+$ function Bed(x,y) \
+  import Para {\
+  _Bed  = 100.0*(x+200.0)^0.25 + x/60.0 - 2.0e10^0.25 + Hmin ;\
+}
+

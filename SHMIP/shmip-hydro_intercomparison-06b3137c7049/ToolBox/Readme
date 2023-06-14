@@ -1,0 +1,52 @@
+The ToolBox is constituted of three different tolls as of now, a routine to check the structure of your netCDF files (SHMIPncTest.py) and two plotting routines (SHMIPPloter.py and SyntheticPlotter.py). All these routines are coded in python2 and should be executable directly form the command line. 
+
+===============netCDF tester SHMIPncTest.py:===============
+
+	You should start by this one once you have a output netCDF file compatible with the structure given on the SHMIP website. 
+	
+	The tester is ran with the following command :
+			./SHMIPncTest.py PathToFile.nc
+
+	If your file is compatible with the SHMIP requirement you will get a 'Tests passed, your file should be fine.' message that indicate that no problems have been detected within your file. Error messages should be clear enough that you could figure what is wrong with your file. The tester could have over-watched some problems so if you get any issues when trying to use the plotting routine please report them to Basile (basile.defleurian@uib.no) to update the plotter and/or checker accordingly.
+
+	As of now the checker is only designed to be used on unstructured output. If you are planning to upload results on a regular grid send your netCDF file to Basile and he will prepare a checker accordingly.
+
+
+===============Single experimenter plotter SHMIPPlotter.py:===============
+
+	DISCLAIMER: These figures are not publication ready, you may have some text cut out and non fitting labels at some point, I am still working on that to make it as clean as possible while still being able to treat multiple inputs.
+
+	This routine provides the possibility to draw the plots that were presented at the EGU Splinter meeting. We think that these plots are giving a good overview of the model results. Some new plots may be added in the future and the Readme should be updated at the same time.
+
+	The Plotter is ran from the directory in which the results are sitting with the following command :
+			./SHMIPPloter.py Keyword
+
+	Running without a keyword will give you an overview of the different plots and the keywords needed to generate them. The different keywords available now are: 
+					-Sections
+					-Maps
+					-Enveloppes
+					-Evol
+
+	The routine has to be run from your result folder. 
+
+	The output of the routine are pdf and png versions of the figures that are saved in a folder in your Result directory. The folder will be created the first time you run the routine. If ever you want to change this folder you should change the path in 'figdir'.
+
+	Once you launch the routine with a key word it will ask you for three things, 
+			 - first 'Give the name of the experimenter and model run:' this is the name that appears in the netCDF files, if you want to plot data for Mauro Werders version one of the code you will enter 'mwer_1'
+			 - next 'Give the variable you want to plot:' this is the name of the variable you want to plot as it appears in the netCDF file. The routine has been used extensively to plot effective pressure but not much on other variable so you may encounter some issues there (bad labels, not working at all).
+			 - finally 'Give the tag of the experiment you want to plot:' you can either give the tag of a complete suite 'A' and get the plot for all the runs of this suite on one figure, or just ask for 'A1' and get only the plot for this simulation.
+
+
+	The different plots that you can have are the following:
+
+			Sections: Will give you the value of the data you asked for function of the X coordinate. You get one point per model node and not a mean on the cross section.
+
+			Maps: Will give you a plan view of the variable you are plotting.
+
+			Enveloppes: This one is a composite plot that only make sens if you are plotting the effective pressure on an entire suite. It will produce a 6 panels figure. Upper left panel present the variable value function of X and the maximum and minimum enveloppe for the variable for the simulation 4 of the suite. Lower left present the thickness of the enveloppe function of X for the same simulation. On the right, the four panels are showing global variables function of the index of the simulation in the suite. Upper one is the maximum value of the effective pressure, second one is the position where the maximum effective pressure is reached (X coordinate), next is the maximum drainage efficiency which is defined as the maximum thickness of the enveloppe. And the bottom panel presents the mean drainage efficiency defined as the mean thickness of the enveloppe.
+
+			Evol: On this one, the upper row shows the evolution of the variable in function of altitude. The bottom row show the evolution of the altitudinal mean of the variable in time. The altitudinal mean is computed as the mean value of the variable on 150m elevation bins.
+
+===============Multiple experimenter plotter (SyntheticPlotter.py):===============
+
+	This one follows the structure of the GHIPPloter but is designed to be able to plot data for different experimenter (Model version) alongside each-over. Functioning and type of figures are the same as in GHIPPloter. Further information will be added later. (This may be broken at this time)

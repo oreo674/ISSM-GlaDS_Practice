@@ -1,0 +1,50 @@
+For a introduction see: http://alistapart.com/article/get-started-with-git
+For a tutorial see: https://www.atlassian.com/git/tutorial
+For a book got to http://progit.org/book/
+
+Basic workflow
+==============
+
+Before making changes, pull (if you remember/can) to get the latest
+and greatest from the bitbucket reprository:
+
+$ git pull
+
+Make your changes.  If you make new files include them with
+
+$ git add new_file
+
+Check what's on with
+
+$ git status
+
+If you're happy with what you've done commit it into your local repository
+
+$ git commit -am 'some descriptive text of changes here'
+
+To get it to bitbucket do:
+
+First pull the latest from gitbucket (if only one person is working at
+the time this will do nothing but it's good practice)
+
+$ git pull
+
+If it says that there are merge conflicts resolve them (this is beyond
+the scop of this howto see http://progit.org/book/ch3-2.html, ignore
+the first section and scroll down to 'Basic Merge Conflicts')
+
+The push your changes to bitbucket:
+
+$ git push
+
+What to do if you have local changes you don't want to commit
+-------------------------------------------------------------
+
+Say you made some change to your local copy but don't want to commit
+them.  But if you try to pull from bitbucket it will give an error.
+Do:
+
+$ git stash
+$ git pull
+$ git stash pop
+

@@ -1,0 +1,12 @@
+*.queue
+*.bin
+*.toolkits
+*.tar.gz
+*.outlog
+*.errlog
+*.outbin
+*#*#
+*/Models/
+*/Results/
+*/Figures/
+box100by20/RunScripts/Archive/

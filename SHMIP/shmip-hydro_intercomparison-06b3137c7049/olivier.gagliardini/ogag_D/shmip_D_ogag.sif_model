@@ -1,0 +1,287 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Simulation                      !!
+!!                                 !!
+!! Olivier Gagliardini Dec 2014    !!
+!!                                 !!
+!! SHMIP - test D  - November 2016 !!
+!!                                 !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+check keywords warn
+echo on
+
+!!!  Name From D1 to D5 !!!
+$Dnum = "D<num>"
+$namerun = "<name>"
+
+include ./../Parameters/sqrt_geometry.sif
+include ./../Parameters/parameters.sif
+
+! Many years of simulation, only the last year is saved in netcdf
+! TimeStepPerYear = yearindays/dt (dt in days)
+$Nyear = 50
+$Invdt = 4 !1/dt in 1/day
+$TimeStepPerYear = yearindays*Invdt
+$Iter = Nyear*TimeStepPerYear
+$dtIni = 1.0/TimeStepPerYear !dt in year
+! Output every year (vtu)
+$OutPut = TimeStepPerYear
+
+$ev = 0.0 
+
+Header
+  Mesh DB "." "mesh_unst"
+End
+
+!---------------------------------------------------
+!---------------- CONSTANTS ------------------------
+!---------------------------------------------------
+
+Constants
+  Latent Heat = Real $Lw
+  Gravity Norm = Real $gravity
+  Water Density = Real $rhow
+  Ice Density = Real $rhoi
+  Sheet Thickness Variable Name = String "Sheet Thickness"
+  Hydraulic Potential Variable Name = String "Hydraulic Potential"
+  Channel Area Variable Name = String "Channel Area"
+  Bedrock Variable Name = String "Zb"
+  
+  DT Parameter = Real <DT>
+  ! D1 : DT = -4.0
+  ! D2 : DT = -2.0
+  ! D3 : DT =  0.0
+  ! D4 : DT = +2.0
+  ! D5 : DT = +4.0
+End
+
+!---------------------------------------------------
+!---------------- SIMULATION -----------------------
+!---------------------------------------------------
+
+Simulation
+  Coordinate System  = Cartesian 2D 
+  Simulation Type = transient
+
+  Timestepping Method = "bdf"
+  BDF Order = 1
+
+  Timestep Intervals(1) = $Iter
+  Output Intervals(1) = $OutPut
+  Timestep Sizes(1) = $dtIni 
+
+! Adaptive Timestepping = Logical True
+! Adaptive Time Error = Real 1.0e-1 ! keep smaller for true transient? 
+! Adaptive Min Timestep = Real $dtMin
+! Adaptive Keep Smallest = Integer 1 
+
+  Steady State Max Iterations = 1 
+  Steady State Min Iterations = 1
+
+  Output File = "$namerun".result"
+  Post File = "$namerun".vtu"
+  
+  Restart File = "../../ogag_A/mesh_unst/A1_ogag.result"
+  Restart Position = 0
+  Restart Time = Real 0.0
+  Restart Before Initial Conditions = Logical True
+
+  max output level = 3
+End
+
+!---------------------------------------------------
+!---------------- BODIES ---------------------------
+!---------------------------------------------------
+
+! This body is located at the ice/bed interface and will be used to solve 
+! the sheet equation
+Body 1
+  Name= "sheet"
+  Equation = 1
+  Material = 1
+  Body Force = 1
+  Initial Condition = 1
+End
+
+
+!---------------------------------------------------
+!---------------- INITIAL CONDITIONS ---------------
+!---------------------------------------------------
+
+!! for the sheet 
+Initial Condition 1
+! Sheet Thickness = Real $Hs
+! Zs = Variable Coordinate 1
+!   Real MATC "H(tx)"
+! Zb = Real 0.0 
+! Effective Pressure = Variable Coordinate 1
+!    Real MATC "rhoi*gravity*H(tx)"
+End
+
+!---------------------------------------------------
+!---------------- BODY FORCES ----------------------
+!---------------------------------------------------
+
+! source 
+Body Force 1
+  Hydraulic Potential Volume Source = Variable Zs, Time
+     Real Procedure "./USF_Dseasonal" "GetMeltInput"
+End
+
+!---------------------------------------------------
+!---------------- MATERIALS ------------------------
+!---------------------------------------------------
+
+!! ice material properties in MPa - m - a system 
+Material 1
+  Density = Real $rhoi          
+  Glen Exponent = Real $ng
+
+! For the sheet 
+  Sheet Conductivity = Real $Ks 
+  Sheet flow exponent alpha = Real $alphas
+  Sheet flow exponent beta = Real $betas
+  Englacial Void Ratio = Real $ev       
+
+  Sliding Velocity = Real $ub
+
+  Bedrock Bump Length = Real $lr
+  Bedrock Bump High = Real $hr
+  Sheet Closure Coefficient = Real $Ar 
+! For the Channels
+  Channel Conductivity = Real $Kc 
+  Channel flow exponent alpha = Real $alphac
+  Channel flow exponent beta = Real $betac
+  Channel Closure Coefficient = Real $Ac
+  Sheet Width Over Channel = Real $lc
+  Pressure Melting Coefficient = Real $Ct
+  Water Heat Capacity = Real $Cw
+
+! For both
+  Ice Normal Stress = Variable Coordinate 1
+     Real Procedure "./USF_CouplingSSA" "OverburdenPressure"
+End
+
+!---------------------------------------------------
+!---------------- SOLVERS --------------------------
+!---------------------------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Solver 1 
+  Equation = "GlaDS Coupled sheet"
+  Procedure = "ElmerIceSolvers" "GlaDSCoupledSolver"
+  Variable = -dofs 1 "Hydraulic Potential"
+
+  Activate Channels = Logical True
+  Activate Melt from Channels = Logical True
+  Neglect Sheet Thickness in Potential = Logical True
+
+  ! choices are EXPLICT, CRANK-NICHOLSON, IMPLICIT
+  Channels Integration method = String "Crank-Nicolson"
+  Sheet Integration method = String "Implicit"
+
+  Exported Variable 1 = -dofs 1 "Vclose"
+  Exported Variable 2 = -dofs 1 "Wopen"
+  Exported Variable 3 = -dofs 1 "Normal Stress"
+  Exported Variable 4 = -dofs 1 "Water Pressure"
+  Exported Variable 5 = -dofs 1 "Effective Pressure"
+  Exported Variable 6 = -dofs 2 "Sheet Discharge"
+  Exported Variable 7 = -dofs 1 "Sheet Storage"
+  Exported Variable 8 = -dofs 1 "Zs"
+  Exported Variable 9 = -dofs 1 "Zb"
+
+  Linear System Solver = Direct     
+  Linear System Direct Method = umfpack
+
+  Nonlinear System Max Iterations = 50
+  Nonlinear System Convergence Tolerance  = 1.0e-8
+  Nonlinear System Relaxation Factor = 1.00
+
+  Coupled Max Iterations = Integer 10
+  Coupled Convergence Tolerance = Real 1.0e-3
+
+  Steady State Convergence Tolerance = 1.0e-03
+End
+
+Solver 2 
+  ! Just here to declare the variable Sheet Thickness
+  Equation = "GlaDS Thickness sheet"
+  Procedure = "ElmerIceSolvers" "GlaDSsheetThickDummy"
+  Variable = -dofs 1 "Sheet Thickness"
+End
+
+Solver 3 
+  ! Just here for output and declare the Channel Area variable
+  Exec Solver = After Saving
+  Equation = "GlaDS Channel OutPut"
+  Procedure = "ElmerIceSolvers" "GlaDSchannelOut"
+  Variable = -dofs 1 "Channel Area"
+! Define that the variable is define on the edges only
+  Element = "n:0 e:1"
+  
+  Exported Variable 1 = -dofs 1 "Channel Flux"
+
+  VTK OutPutFile = Logical True 
+  ASCII OutPutFile = Logical False
+  Channels OutPut File Name = String "$namerun"_channels"
+
+  Steady State Convergence Tolerance = 1.0e-03
+End
+
+Solver 4
+  Equation = "SAVE-NETCDF"
+  Variable = -nooutput dumy
+  Procedure = "SaveNetcdf" "SAVENETCDF"
+  
+  Number of Outputs = Integer $(TimeStepPerYear+1)
+  First Time saved = Real $(Nyear-1.0)
+  OutputFile Name = File "$namerun".nc"
+End
+
+Solver 5
+  Exec Solver =  After TimeStep  ! For transient simualtion
+  Procedure = File "SaveData" "SaveScalars"
+  Filename  = File "$namerun"_scalars.dat"
+  File Append = Logical True     ! For transient simualtion
+
+  Variable 1 = String "Time"
+
+  Variable 2 = String "Effective Pressure"
+  Operator 2 = String "Mean"
+  Operator 3 = String "Min"
+  Operator 4 = String "Max"
+
+  Operator 5 = String "cpu time"
+End
+
+!---------------------------------------------------
+!---------------- EQUATIONS ------------------------
+!---------------------------------------------------
+! Equation for the ice
+Equation 1
+  Active Solvers (5) = 1 2 3 4 5
+End
+
+
+!---------------------------------------------------
+!---------------- BOUNDARY CONDITIONS --------------
+!---------------------------------------------------
+
+Boundary Condition 1
+  Target Boundaries(2) = 1 3
+  No Channel BC = Logical True
+End
+
+Boundary Condition 2
+  Name = "Sym"
+  Target Boundaries(1) = 1
+  No Channel BC = Logical True
+End
+
+Boundary Condition 3
+  Name = "front"
+  Target Boundaries(1) = 4
+  Hydraulic Potential = Real 0.0
+  No Channel BC = Logical True
+End

@@ -1,0 +1,6 @@
+# transform csv files into readable files for Elmer/Ice
+awk -F "," '{print $2,$3}' B1_M.csv > B1_M.xy
+awk -F "," '{print $2,$3}' B2_M.csv > B2_M.xy
+awk -F "," '{print $2,$3}' B3_M.csv > B3_M.xy
+awk -F "," '{print $2,$3}' B4_M.csv > B4_M.xy
+awk -F "," '{print $2,$3}' B5_M.csv > B5_M.xy

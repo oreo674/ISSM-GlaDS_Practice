@@ -1,0 +1,10 @@
+gmsh -1 -2 mesh_B1.geo
+gmsh -1 -2 mesh_B2.geo
+gmsh -1 -2 mesh_B3.geo
+gmsh -1 -2 mesh_B4.geo
+gmsh -1 -2 mesh_B5.geo
+ElmerGrid 14 2 mesh_B1.msh -autoclean
+ElmerGrid 14 2 mesh_B2.msh -autoclean
+ElmerGrid 14 2 mesh_B3.msh -autoclean
+ElmerGrid 14 2 mesh_B4.msh -autoclean
+ElmerGrid 14 2 mesh_B5.msh -autoclean

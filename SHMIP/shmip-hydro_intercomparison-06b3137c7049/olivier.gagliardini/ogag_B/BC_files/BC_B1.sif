@@ -1,0 +1,8 @@
+! This is the boundary condition for the moulins, case B1
+Boundary Condition 4
+  Name = "moulins"
+  Target Boundaries(1) = 5
+  Moulin Storage = Logical True
+  Moulin Area = Real $Am
+  Moulin Flux = Real $90.0*yearinsec
+End

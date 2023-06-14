@@ -1,0 +1,28 @@
+This is a simple 1D subglacial hydrology model implementing the linked
+cavity + R-channel equations, aka conduits (Kessler & Anderson 2004,
+Schoof 2010). Here, it is used in SHMIP.
+
+I created this for the "Subglacial processes workshop at Centre for
+Ice and Climate, The Niels Bohr Institute, University of Copenhagen
+7-11th April 2014".
+
+See my website for more course materials:
+http://maurow.bitbucket.org/teaching/copenhagen2014.html
+
+Tested with Matlab R2013a and Octave 3.8.1.
+
+This code is Copyright (c) 2014 Mauro Werder and is licensed under a
+BSD 2-Clause License (see LICENCE file).  Parts of it is derived from
+the sparseFEM package https://bitbucket.org/maurow/sparsefem
+
+%%%%%%%%%%%%%%%%%
+To begin a session, initialize with the startup.m script, then cd in to the 'model' directory.
+
+The script, 'runner.m', is set to run all suites of the SHMIP series. 
+However, for some runs (i.e. B1) changes to tolerances or storage capacity (sigma)
+might be required for the model to run properly.
+Also the workspace is saved in the form .mat to a directory, '../results', from this present directory.
+
+Axuillary files, now only for moulin inputs, is included in this directory.
+
+A script, save_netcdf, is included. 0nce again this script is set to be run once all .mat files are creates.

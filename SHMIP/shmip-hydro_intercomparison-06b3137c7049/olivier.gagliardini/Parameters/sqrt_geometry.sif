@@ -1,0 +1,9 @@
+! Definition of the sqrt geometry 
+! for SHMIP A, B, C, D
+
+$Hmin = 1.0
+$ function H(x) \
+  import Hmin {\
+  _H  = 6.0*(sqrt(x+5e3)-sqrt(5e3))+Hmin ;\
+}
+
