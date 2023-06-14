@@ -58,9 +58,11 @@ function SHMIP_D = runme(DT,ti, name)
         md.initialization.channelarea = 1e-6*ones(md.mesh.numberofedges, 1);
 
         % FORCING
-         md.hydrology.melt_flag = 1;
-         md.basalforcings.groundedice_melting_rate = zeros(md.mesh.numberofvertices);
-         md.basalforcings.geothermalflux = 0; %% OG value is 50mW/m^2
+
+
+        md.hydrology.melt_flag = 1;
+        md.basalforcings.groundedice_melting_rate = 1*ones(md.mesh.numberofvertices, 1);
+        md.basalforcings.geothermalflux = 0; %% OG value is 50mW/m^2
         %%% Get rid of these forcings? %%%
         
         %%% Use time-dep mass balance or ground_ice_melt?
@@ -87,6 +89,7 @@ function SHMIP_D = runme(DT,ti, name)
         % Define the time stepping scheme
         md.timestepping=timesteppingadaptive();
         md.timestepping.time_step_min=86400/md.constants.yts;
+
         md.settings.output_frequency = 5;	    % Only save results every 5 timesteps
         md.timestepping.cfl_coefficient = 0.5;  % Must be <1 for stability
         md.timestepping.final_time=ti;          % 10 years
@@ -108,6 +111,7 @@ function SHMIP_D = runme(DT,ti, name)
 
         %%Time and temp dependence
         %year = 31536000; sec per yr (for simu time in s)
+
         year = 1;% ???
         lr = -0.0075;% is this the correct val? units
         DDF = 0.01*365;% is this the correct val? units m/(K*s)
