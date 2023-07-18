@@ -1,0 +1,25 @@
+%Start defining model parameters here
+
+addpath('topo/')
+% [surf, bed] = ... TBD
+md.geometry.base = bed;
+md.geometry.bed = md.geometry.base;
+md.geometry.surface = surf;
+% Enforce that surface >= bed
+md.geometry.surface(surf<=bed) = bed(surf<=bed) + 1e-3;
+md.geometry.thickness = md.geometry.surface - md.geometry.base;
+
+% Materials
+% Ice flow law parameter (note that the standard parameter A=B^(-3))
+md.materials.rheology_B= (5e-25)^(-1/3)*ones(md.mesh.numberofvertices,1);
+md.initialization.temperature=(273)*ones(md.mesh.numberofvertices,1);
+md.materials.rheology_n=3.*ones(md.mesh.numberofelements,1);
+
+%Calving
+md.calving.calvingrate=zeros(md.mesh.numberofvertices,1);
+
+% Friction - need to specify but not used
+md.friction.coefficient = 1;
+md.friction.p = 1;
+md.friction.q = 1
+
