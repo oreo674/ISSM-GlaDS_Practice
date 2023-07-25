@@ -1,4 +1,12 @@
-steps=[1];
+% Smooth KW simulation
+%
+% TODO:
+%  * Matlab smoothing-spline fit to KR's melt data for better melt forcing
+%  * Sensitivity to different Dirichlet outlets
+%  * Neumann BCs --> Reduce negative water pressures?
+%  * Documentation throughout workflow
+
+steps=[1:3];
 set_paths;
 experiment_name = 'KWsmooth';
 
@@ -30,7 +38,7 @@ if any(steps==2)
     md.hydrology.cavity_spacing = 2;
     md.hydrology.bump_height = 0.1*ones(md.mesh.numberofvertices, 1);
     md.hydrology.englacial_void_ratio = 1e-5;
-    md.hydrology.omega = 1/2000;
+    % md.hydrology.omega = 1/2000; % TH: need to share these changes...
 
     % Allow channels and set channel conductivity
     md.hydrology.ischannels = 1;
@@ -41,11 +49,12 @@ if any(steps==2)
     md.hydrology.spcphi = NaN(md.mesh.numberofvertices,1);
     % TODO: sort out boundary conditions
     % pos=find(md.mesh.vertexonboundary & md.mesh.x==min(md.mesh.x));
-    % md.hydrology.spcphi(pos)=0;
+    pos = 5;
+    md.hydrology.spcphi(pos) = 1000*9.81*md.geometry.bed(pos);
 
     % Specify no-flux Type 2 boundary conditions on all edges (except
     % the Type 1 condition set at the outflow above)
-    % md.hydrology.neumannflux=0*ones(md.mesh.numberofelements,1);
+    md.hydrology.neumannflux=0*ones(md.mesh.numberofelements,1);
     % md.hydrology.neumannflux(md.mesh.x>=30e3) = 0.01/md.constants.yts * 30e3;
 
     % INITIAL CONDITIONS
@@ -64,8 +73,8 @@ if any(steps==2)
     % FORCING
     md.hydrology.melt_flag = 1;
     % TODO: better melt forcing
-    md.basalforcings.groundedice_melting_rate = 2;
-    md.basalforcings.geothermalflux = 50;
+    md.basalforcings.groundedice_melting_rate = 2*ones(md.mesh.numberofvertices,1);
+    md.basalforcings.geothermalflux = 0;
 
     % Zero moulin inputs
     md.hydrology.moulin_input = zeros(md.mesh.numberofvertices, 1);
@@ -91,8 +100,8 @@ if any(steps==3)
     md.settings.output_frequency = 24;
     md.timestepping.final_time = 1;
 
-    md.initialization.vel = zeros(md.mesh.numberofvertices, 1) + 10;
-    md.initialization.vx = zeros(md.mesh.numberofvertices, 1) - 10;
+    md.initialization.vel = zeros(md.mesh.numberofvertices, 1) + 30;
+    md.initialization.vx = zeros(md.mesh.numberofvertices, 1) + 30;
     md.initialization.vy = zeros(md.mesh.numberofvertices, 1) + 0;
     md.miscellaneous.name = experiment_name;
 

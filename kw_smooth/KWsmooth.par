@@ -1,12 +1,11 @@
 %Start defining model parameters here
 
 addpath('topo/')
-% [surf, bed] = ... TBD
+surf = load('./topo/sfc_mesh.txt');
+bed = load('./topo/bed_mesh.txt');
 md.geometry.base = bed;
 md.geometry.bed = md.geometry.base;
 md.geometry.surface = surf;
-% Enforce that surface >= bed
-md.geometry.surface(surf<=bed) = bed(surf<=bed) + 1e-3;
 md.geometry.thickness = md.geometry.surface - md.geometry.base;
 
 % Materials

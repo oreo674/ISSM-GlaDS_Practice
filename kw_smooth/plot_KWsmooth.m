@@ -1,4 +1,4 @@
-model_name = 'KWsyntheticv2';
+model_name = 'KWsmooth';
 output_fname = [model_name, '.mat'];
 md_struct = load(output_fname);
 md = md_struct.md;
@@ -33,6 +33,8 @@ time = [md.results.TransientSolution.time];
 phi_base = md.materials.rho_water*md.constants.g*md.geometry.bed;
 pw = phi - phi_base;
 floatation = pw./(N + pw);
+Q = abs([md.results.TransientSolution.ChannelDischarge]);
+S = abs([md.results.TransientSolution.ChannelArea]);
 figure;
 scatter(md.mesh.x, pw(:, end)/1e6)
 xlabel('x (km)')
@@ -57,18 +59,19 @@ hold on
 patch('Faces', connect, 'Vertices', nodes, 'EdgeColor', 'none',...
         'FaceVertexCData', floatation(:, end), 'FaceColor', 'flat')
 axis image
-% cmocean('balance', 'Pivot', 0)
-cmocean('dense')
-clim(ax1, [0, 1])
-xlim(ax1, [0, 30])
-ylim(ax1, [-2.5, 2.5])
-yticks(ax1, [0, 12.5, 25])
+cmocean('balance')
+clim([-1, 1])
+% cmocean('dense')
+% clim(ax1, [0, 1])
+% xlim(ax1, [0, 30])
+% ylim(ax1, [-2.5, 2.5])
+% yticks(ax1, [0, 12.5, 25])
 % clim(ax1, [0, 0.1])
 
 % Add channels
 Q_cmap = cmocean('turbid');
 Qmin = 0.1; Qmax = 5;
-plotchannels(md, abs(md.results.TransientSolution(end-10).ChannelDischarge),...
+plotchannels(md, abs(md.results.TransientSolution(end).ChannelDischarge),...
         'colormap', Q_cmap, 'min', Qmin, 'max', Qmax)
 
 % SHEET THICKNESS
@@ -78,8 +81,8 @@ patch('Faces', connect, 'Vertices', nodes, 'EdgeColor', 'none',...
         'FaceVertexCData', h_sheet(:, end), 'FaceColor', 'flat')
 axis image
 cmocean('matter')
-xlim(ax2, [0, 30])
-ylim(ax2, [-2.5, 2.5])
+% xlim(ax2, [0, 30])
+% ylim(ax2, [-2.5, 2.5])
 clim(ax2, [0, 0.1])
 
 % Add channels
