@@ -1,8 +1,7 @@
 % Smooth KW simulation
 %
 % TODO:
-%  * Matlab smoothing-spline fit to KR's melt data for better melt forcing
-%  * Sensitivity to different Dirichlet outlets
+%  * Terminus BCs/domain: cut thin parts of terminus
 %  * Neumann BCs --> Reduce negative water pressures?
 %  * Documentation throughout workflow
 
@@ -49,7 +48,7 @@ if any(steps==2)
     md.hydrology.spcphi = NaN(md.mesh.numberofvertices,1);
     % TODO: sort out boundary conditions
     % pos=find(md.mesh.vertexonboundary & md.mesh.x==min(md.mesh.x));
-    pos = 5;
+    pos = [5, 256];
     md.hydrology.spcphi(pos) = 1000*9.81*md.geometry.bed(pos);
 
     % Specify no-flux Type 2 boundary conditions on all edges (except
@@ -73,7 +72,14 @@ if any(steps==2)
     % FORCING
     md.hydrology.melt_flag = 1;
     % TODO: better melt forcing
-    md.basalforcings.groundedice_melting_rate = 2*ones(md.mesh.numberofvertices,1);
+%     md.basalforcings.groundedice_melting_rate = 2*ones(md.mesh.numberofvertices,1);
+    melt_struct = load('./forcing/melt_elevation_fit.mat');
+    melt_fit = melt_struct.curve;
+    melt_rate = melt_fit(md.geometry.surface);
+    disp('Min/max melt rate:')
+    disp(min(melt_rate))
+    disp(max(melt_rate))
+    md.basalforcings.groundedice_melting_rate = melt_rate;
     md.basalforcings.geothermalflux = 0;
 
     % Zero moulin inputs
@@ -97,7 +103,7 @@ if any(steps==3)
 
     % Define the time stepping scheme
     md.timestepping.time_step = 3600/md.constants.yts;
-    md.settings.output_frequency = 24;
+    md.settings.output_frequency = 3*24;
     md.timestepping.final_time = 1;
 
     md.initialization.vel = zeros(md.mesh.numberofvertices, 1) + 30;

@@ -55,3 +55,15 @@ bndry_indices = find(bndry);
 outlet_index = bndry_indices(phi_min_index);
 disp('Outlet index:')
 disp(outlet_index)
+
+% Plot potential just on terminus lobe - requires manual intervention
+terminus_nodes = [181, 327, 182, 204, 183, 184, 217, 1, 218, 2, 250,...
+    259, 3, 260, 4, 261, 5, 279, 6];
+figure
+plot(bndry_phi(terminus_nodes))
+text(1:length(terminus_nodes), bndry_phi(terminus_nodes), string(terminus_nodes))
+grid on
+
+disp('Multiple outlet indices:')
+outlet_indices = bndry_indices([5, 204]);
+disp(outlet_indices)
