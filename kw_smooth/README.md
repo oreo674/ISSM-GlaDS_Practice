@@ -13,7 +13,7 @@ outline (`contour.dat`), we cut off areas above the ELA (~2260 m asl.) and
 small tribtaries (see `generate_outline.py`). This python script also generates
 the outline file needed by the model (`KWsmooth.outline.exp`).
 
-From this simplified contour (`KW_outline_simplified.txt'), we generate a 
+From this simplified contour (`KW_outline_simplified.txt`), we generate a 
 triangular mesh (in the first few lines of `run_KWsmooth.m`). With the mesh,
 `interp_bed_sfc_elevation.m` interpolates the bed and surface DEMs onto the
 mesh with nearest-neighbour interpolation and plots the hydraulic potential
