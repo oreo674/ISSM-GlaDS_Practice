@@ -48,8 +48,8 @@ contour_elev = contour_elev_interp(contour)
 contour_above_ELA = np.where(contour_elev>=ELA)[0]
 
 # Label all boundary nodes with their index to fit nodes to cut
-# for i in range(len(contour[:, 0])):
-#     ax.text(contour[i, 0]/1e3, contour[i, 1]/1e3, labels[i])
+for i in range(len(contour[:, 0])):
+    ax.text(contour[i, 0]/1e3, contour[i, 1]/1e3, labels[i])
 
 # Record ranges of indices to cut
 branches_to_cut = [

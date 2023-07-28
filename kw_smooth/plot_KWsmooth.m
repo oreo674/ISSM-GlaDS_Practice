@@ -6,24 +6,6 @@ md.mesh.x = md.mesh.x/1e3;
 md.mesh.y = md.mesh.y/1e3;
 nodes = [md.mesh.x, md.mesh.y];
 
-% PLOT GEOMETRY
-figure;
-xc = 0:0.1:30;
-ff_bed = scatteredInterpolant(md.mesh.x, md.mesh.y, md.geometry.bed);
-ff_thick = scatteredInterpolant(md.mesh.x, md.mesh.y, md.geometry.thickness);
-bed_center = ff_bed(xc, 0*xc);
-thick_center = ff_thick(xc, 0*xc);
-plot(xc, bed_center);
-hold on
-plot(xc, thick_center + bed_center);
-grid on
-xlabel('x (km)')
-ylabel('z (m)')
-yyaxis right
-plot(xc, thick_center)
-ylabel('Thickness (m)')
-legend({'Bed', 'Surface', 'Thickness'})
-
 
 % Simple scatter plot
 N = [md.results.TransientSolution.EffectivePressure];

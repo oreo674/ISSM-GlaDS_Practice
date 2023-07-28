@@ -2,8 +2,8 @@
 %
 % TODO:
 %  * Terminus BCs/domain: cut thin parts of terminus
+%  * Finer mesh
 %  * Neumann BCs --> Reduce negative water pressures?
-%  * Documentation throughout workflow
 
 steps=[1:3];
 set_paths;
@@ -46,33 +46,31 @@ if any(steps==2)
     % BOUNDARY CONDITIONS
     % Set pressure=0 at terminus
     md.hydrology.spcphi = NaN(md.mesh.numberofvertices,1);
-    % TODO: sort out boundary conditions
-    % pos=find(md.mesh.vertexonboundary & md.mesh.x==min(md.mesh.x));
+
+    % Manually set Dirichlet BCs - these are mesh specific!
     pos = [5, 256];
     md.hydrology.spcphi(pos) = 1000*9.81*md.geometry.bed(pos);
 
     % Specify no-flux Type 2 boundary conditions on all edges (except
     % the Type 1 condition set at the outflow above)
     md.hydrology.neumannflux=0*ones(md.mesh.numberofelements,1);
-    % md.hydrology.neumannflux(md.mesh.x>=30e3) = 0.01/md.constants.yts * 30e3;
 
     % INITIAL CONDITIONS
 
-    % Water layer thickness = 10% of bed bump height
+    % Water layer thickness set as fraction of bed bump height
     md.initialization.watercolumn = 0.5*md.hydrology.bump_height.*ones(md.mesh.numberofvertices, 1);
 
-    % Set initial pressure equal to overburden
+    % Set initial pressure as some fraction of overburden
     phi_bed = md.constants.g*md.materials.rho_freshwater*md.geometry.base;
     p_ice = 0.5*md.constants.g*md.materials.rho_ice*md.geometry.thickness;
     md.initialization.hydraulic_potential = phi_bed + p_ice;
 
-    % Small nonzero channel area
     md.initialization.channelarea = 0*ones(md.mesh.numberofedges, 1);
 
     % FORCING
     md.hydrology.melt_flag = 1;
-    % TODO: better melt forcing
-%     md.basalforcings.groundedice_melting_rate = 2*ones(md.mesh.numberofvertices,1);
+
+    % Use spline fit to KR's melt forcing data
     melt_struct = load('./forcing/melt_elevation_fit.mat');
     melt_fit = melt_struct.curve;
     melt_rate = melt_fit(md.geometry.surface);
