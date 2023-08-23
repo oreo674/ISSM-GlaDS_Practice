@@ -1,4 +1,4 @@
-function SHMIP_D = runme(DT,ti, name)
+function SHMIP_D = badrunme(DT,ti, name)
     close all
     steps=[1:3];
     set_paths;
@@ -88,10 +88,9 @@ function SHMIP_D = runme(DT,ti, name)
 
         % Define the time stepping scheme
         md.timestepping=timesteppingadaptive();
-        md.timestepping.time_step_min=1/86400;% min step of 1 hour
-        md.timestepping.time_step_max = 5*86400/md.constants.yts;% max step is 5 days
+        md.timestepping.time_step_min=86400/md.constants.yts; % min step of 1 day
 
-        md.settings.output_frequency = 24;	    % Only save results every 24 timesteps
+        md.settings.output_frequency = 5;	    % Only save results every 5 timesteps
         md.timestepping.cfl_coefficient = 0.5;  % Must be <1 for stability
         md.timestepping.final_time=ti;          % specified in function
         
@@ -142,4 +141,3 @@ function SHMIP_D = runme(DT,ti, name)
     
 
 end
-
